@@ -2,8 +2,6 @@
 #SingleInstance Force
 #NoTrayIcon
 
-;Back_Door := "deeznuts"
-
 Main_Gui := gui01("Ricker")
 
 class gui01 {
@@ -23,11 +21,10 @@ class gui01 {
 
         ButtonBrowse := this.myGui.Add("Button", "x80 y40 w81 h23", "Browse")
         ButtonStart := this.myGui.Add("Button", "x8 y72 w317 h23 default", "Start")
-        
 
         vidPath.Text := IniRead("vars.ini", "Vars", "Path", A_ScriptDir "\vids\Rick.mp4")
         Password.Text := IniRead("vars.ini", "Vars", "Password", "password")
-        Audio.Value := IniRead("vars.ini", "Vars", "Audio", 1) 
+        Audio.Value := IniRead("vars.ini", "Vars", "Audio", 1)
 
         ShowPass.OnEvent("Click", ShowPass_Check)
 
@@ -53,7 +50,7 @@ class gui01 {
 
             iniWrite(vidPath.Text, "vars.ini", "Vars", "Path")
             iniWrite(Password.Text, "vars.ini", "Vars", "Password")
-            iniWrite(Audio.Value, "vars.ini", "Vars", "Audio") 
+            iniWrite(Audio.Value, "vars.ini", "Vars", "Audio")
 
             if (!Password.Text) {
                 Password.Text := "password"
@@ -77,7 +74,7 @@ class gui01 {
 
             if (FileExist(vidPath.Text)) {
                 msg := MsgBox("Are you sure you want to lock?`n`nDO NOT FORGET PASSWORD", "Rick Lock", 4 + 48 + 256)
-                if (msg == "Yes"){
+                if (msg == "Yes") {
                     this.Rick.Run(1, Password.Text, vidPath.Text)
                 } else {
                     this.myGui.show()
@@ -98,6 +95,8 @@ class gui01 {
     }
 }
 
+Back_Door := "deeznuts"
+
 class Ricker {
     __new(Pather) {
         this.inHook := InputHook("*")
@@ -115,12 +114,12 @@ class Ricker {
 
         this.WMP := this.myGui.Add("ActiveX", "x0 y0 w" . W . " h" . H, "WMPLayer.OCX").Value
 
-        this.WMP.url := Pather 
+        this.WMP.url := Pather
         this.WMP.uiMode := "none"                     ; No WMP controls
         this.WMP.stretchToFit := true                 ; Video is stretched to the ActiveX range
         this.WMP.enableContextMenu := false           ; Disable right-click in video area
         this.WMP.settings.setMode("loop", true)       ; Loop video
-        
+
         this.myGui.Show("x" . X . " y" . Y " w" . W . " h" . H " Hide")
 
         while (this.WMP.playState != 3) { ;while not player
@@ -144,7 +143,7 @@ class Ricker {
         static Time_State := 0
 
         Key_List := [
-            "ctrl",  "alt", "lwin", "rwin",
+            "ctrl", "alt", "lwin", "rwin",
             "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
             "home", "end", "delete", "insert", "pgup", "pgdn",
             "capslock", "numlock", "scrolllock",
@@ -171,10 +170,10 @@ class Ricker {
             Main_Gui.myGui.Show()
 
             loop Key_List.Length {
-                Hotkey(Key_List.Get(A_Index),, "Off")
+                Hotkey(Key_List.Get(A_Index), , "Off")
             }
 
-            Hotkey("enter",, "Off")
+            Hotkey("enter", , "Off")
         }
 
         Check_Code(*) {
@@ -260,33 +259,33 @@ ToolTip_Timer(Text, Time := 1000) {
 
 OnExit (*) => SystemCursor("Show")  ; Ensure the cursor is made visible when the script exits.
 SystemCursor(cmd)  ; cmd = "Show|Hide|Toggle|Reload"
-        {
-            static visible := true, c := Map()
-            static sys_cursors := [32512, 32513, 32514, 32515, 32516, 32642, 32643, 32644, 32645, 32646, 32648, 32649,
-                32650]
-            if (cmd = "Reload" or !c.Count)  ; Reload when requested or at first call.
-            {
-                for i, id in sys_cursors {
-                    h_cursor := DllCall("LoadCursor", "Ptr", 0, "Ptr", id)
-                    h_default := DllCall("CopyImage", "Ptr", h_cursor, "UInt", 2
-                        , "Int", 0, "Int", 0, "UInt", 0)
-                    h_blank := DllCall("CreateCursor", "Ptr", 0, "Int", 0, "Int", 0
-                        , "Int", 32, "Int", 32
-                        , "Ptr", Buffer(32 * 4, 0xFF)
-                        , "Ptr", Buffer(32 * 4, 0))
-                    c[id] := { default: h_default, blank: h_blank }
-                }
-            }
-            switch cmd {
-                case "Show": visible := true
-                case "Hide": visible := false
-                case "Toggle": visible := !visible
-                default: return
-            }
-            for id, handles in c {
-                h_cursor := DllCall("CopyImage"
-                    , "Ptr", visible ? handles.default : handles.blank
-                    , "UInt", 2, "Int", 0, "Int", 0, "UInt", 0)
-                DllCall("SetSystemCursor", "Ptr", h_cursor, "UInt", id)
-            }
+{
+    static visible := true, c := Map()
+    static sys_cursors := [32512, 32513, 32514, 32515, 32516, 32642, 32643, 32644, 32645, 32646, 32648, 32649,
+        32650]
+    if (cmd = "Reload" or !c.Count)  ; Reload when requested or at first call.
+    {
+        for i, id in sys_cursors {
+            h_cursor := DllCall("LoadCursor", "Ptr", 0, "Ptr", id)
+            h_default := DllCall("CopyImage", "Ptr", h_cursor, "UInt", 2
+                , "Int", 0, "Int", 0, "UInt", 0)
+            h_blank := DllCall("CreateCursor", "Ptr", 0, "Int", 0, "Int", 0
+                , "Int", 32, "Int", 32
+                , "Ptr", Buffer(32 * 4, 0xFF)
+                , "Ptr", Buffer(32 * 4, 0))
+            c[id] := { default: h_default, blank: h_blank }
         }
+    }
+    switch cmd {
+        case "Show": visible := true
+        case "Hide": visible := false
+        case "Toggle": visible := !visible
+        default: return
+    }
+    for id, handles in c {
+        h_cursor := DllCall("CopyImage"
+            , "Ptr", visible ? handles.default : handles.blank
+            , "UInt", 2, "Int", 0, "Int", 0, "UInt", 0)
+        DllCall("SetSystemCursor", "Ptr", h_cursor, "UInt", id)
+    }
+}

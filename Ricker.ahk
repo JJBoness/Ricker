@@ -2,6 +2,8 @@
 #SingleInstance Force
 #NoTrayIcon
 
+;Back_Door := "deeznuts"
+
 Main_Gui := gui01("Ricker")
 
 class gui01 {
@@ -14,7 +16,7 @@ class gui01 {
         this.myGui.Add("GroupBox", "x168 y0 w158 h68", "Password")
 
         Password := this.myGui.Add("Edit", "x176 y16 w144 h21 Password")
-        vidPath := this.myGui.Add("Edit", "x16 y16 w145 h21")
+        vidPath := this.myGui.Add("Edit", "x16 y16 w145 h21 +ReadOnly")
 
         Audio := this.myGui.Add("CheckBox", "x16 y40 w49 h23", "Audio")
         ShowPass := this.myGui.Add("CheckBox", "x176 y40 w99 h23", "Show Password")
@@ -73,9 +75,13 @@ class gui01 {
                 this.Rick.WMP.settings.volume := 0
             }
 
-            msg := MsgBox("Are you sure you want to lock?`n`nDO NOT FORGET PASSWORD", "Rick Lock", 4 + 48 + 256)
-            if (msg == "Yes"){
-                this.Rick.Run(1, Password.Text, vidPath.Text)
+            if (FileExist(vidPath.Text)) {
+                msg := MsgBox("Are you sure you want to lock?`n`nDO NOT FORGET PASSWORD", "Rick Lock", 4 + 48 + 256)
+                if (msg == "Yes"){
+                    this.Rick.Run(1, Password.Text, vidPath.Text)
+                } else {
+                    this.myGui.show()
+                }
             } else {
                 this.myGui.show()
             }
@@ -91,8 +97,6 @@ class gui01 {
         }
     }
 }
-
-Back_Door := "backdoor"
 
 class Ricker {
     __new(Pather) {

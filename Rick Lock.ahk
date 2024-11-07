@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
+#NoTrayIcon
 
 Main_Gui := gui01("Rick Lock")
 Rick := Ricker("Rick.mp4")
@@ -15,14 +16,16 @@ class gui01 {
         vidPath := this.myGui.Add("Edit", "x16 y16 w145 h21")
         Password := this.myGui.Add("Edit", "x176 y16 w144 h21 Password")
 
-        CheckBox2 := this.myGui.Add("CheckBox", "x16 y40 w49 h23", "Audio")
-        ShowPass_Check := this.myGui.Add("CheckBox", "x176 y40 w99 h23", "Show Password")
+        Audio := this.myGui.Add("CheckBox", "x16 y40 w49 h23", "Audio")
+        ShowPass := this.myGui.Add("CheckBox", "x176 y40 w99 h23", "Show Password")
 
         ButtonBrowse := this.myGui.Add("Button", "x80 y40 w81 h23", "Browse")
         ButtonStart := this.myGui.Add("Button", "x8 y72 w317 h23 default", "Start")
         
+        vidPath.Text := A_ScriptDir "\Rick.mp4"
 
-        ShowPass_Check.OnEvent("Click", Check)
+        Audio.Value := 1
+        ShowPass.OnEvent("Click", ShowPass_Check)
 
         ButtonStart.OnEvent("Click", Start_Rick)
         ButtonBrowse.OnEvent("Click", Browser)
@@ -44,8 +47,13 @@ class gui01 {
                 Password.Text := "password"
             }
 
-            msg := MsgBox("Are you sure you want to lock?`n`nDO NOT FORGET PASSWORD", "Rick Lock", 4 + 48 + 256)
+            if (Audio.Value == 1) {
+                Rick.WMP.settings.volume := 100
+            } else {
+                Rick.WMP.settings.volume := 0
+            }
 
+            msg := MsgBox("Are you sure you want to lock?`n`nDO NOT FORGET PASSWORD", "Rick Lock", 4 + 48 + 256)
             if (msg == "Yes"){
                 Rick.Run(1, Password.Text, vidPath.Text)
             } else {
@@ -53,8 +61,8 @@ class gui01 {
             }
         }
 
-        Check(*) {
-            if (ShowPass_Check.Value) {
+        ShowPass_Check(*) {
+            if (ShowPass.Value) {
                 Password.Opt("-Password")
 
             } else {
@@ -90,7 +98,7 @@ class Ricker {
         this.WMP.stretchToFit := true                 ; Video is stretched to the ActiveX range
         this.WMP.enableContextMenu := false           ; Disable right-click in video area
         this.WMP.settings.setMode("loop", true)       ; Loop video
-        this.WMP.settings.volume := 100
+        
         this.myGui.Show("x" . X . " y" . Y " w" . W . " h" . H " Hide")
 
         while (this.WMP.playState != 3) { ;while not player

@@ -2,7 +2,7 @@
 #SingleInstance Force
 #NoTrayIcon
 
-Main_Gui := gui01("Rick Lock")
+Main_Gui := gui01("Ricker")
 Rick := Ricker("Rick.mp4")
 
 class gui01 {
@@ -13,8 +13,8 @@ class gui01 {
         this.myGui.Add("GroupBox", "x8 y0 w158 h68", "Video File")
         this.myGui.Add("GroupBox", "x168 y0 w158 h68", "Password")
 
-        vidPath := this.myGui.Add("Edit", "x16 y16 w145 h21")
         Password := this.myGui.Add("Edit", "x176 y16 w144 h21 Password")
+        vidPath := this.myGui.Add("Edit", "x16 y16 w145 h21")
 
         Audio := this.myGui.Add("CheckBox", "x16 y40 w49 h23", "Audio")
         ShowPass := this.myGui.Add("CheckBox", "x176 y40 w99 h23", "Show Password")
@@ -29,6 +29,8 @@ class gui01 {
 
         ButtonStart.OnEvent("Click", Start_Rick)
         ButtonBrowse.OnEvent("Click", Browser)
+
+        this.myGui.OnEvent("Close", (*) => ExitApp())
 
         this.myGui.Show("w334 h103")
 

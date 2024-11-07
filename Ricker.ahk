@@ -3,10 +3,10 @@
 #NoTrayIcon
 
 Main_Gui := gui01("Ricker")
-Rick := Ricker("Rick.mp4")
 
 class gui01 {
     __new(Title := "gui01") {
+
         this.myGui := Gui()
         this.myGui.Title := Title
 
@@ -22,9 +22,11 @@ class gui01 {
         ButtonBrowse := this.myGui.Add("Button", "x80 y40 w81 h23", "Browse")
         ButtonStart := this.myGui.Add("Button", "x8 y72 w317 h23 default", "Start")
         
-        vidPath.Text := A_ScriptDir "\Rick.mp4"
 
-        Audio.Value := 1
+        vidPath.Text := IniRead("vars.ini", "Vars", "Path", A_ScriptDir "\vids\Rick.mp4")
+        Password.Text := IniRead("vars.ini", "Vars", "Password", "password")
+        Audio.Value := IniRead("vars.ini", "Vars", "Audio", 1) 
+
         ShowPass.OnEvent("Click", ShowPass_Check)
 
         ButtonStart.OnEvent("Click", Start_Rick)
@@ -34,6 +36,8 @@ class gui01 {
 
         this.myGui.Show("w334 h103")
 
+        this.Rick := Ricker(vidPath.Text)
+
         Browser(*) {
             this.myGui.Opt("+OwnDialogs")
             vidPath.Text := FileSelect(1 + 2, vidPath.Text, "Select Video", "*.mp4")
@@ -42,22 +46,36 @@ class gui01 {
 
         Start_Rick(*) {
             Password.Opt("+Password")
-            ShowPass_Check.Value := 0
+            ShowPass.Value := 0
             this.myGui.Hide()
+
+            iniWrite(vidPath.Text, "vars.ini", "Vars", "Path")
+            iniWrite(Password.Text, "vars.ini", "Vars", "Password")
+            iniWrite(Audio.Value, "vars.ini", "Vars", "Audio") 
 
             if (!Password.Text) {
                 Password.Text := "password"
             }
 
             if (Audio.Value == 1) {
-                Rick.WMP.settings.volume := 100
+                this.Rick.WMP.settings.volume := 100
             } else {
-                Rick.WMP.settings.volume := 0
+                this.Rick.WMP.settings.volume := 0
+            }
+
+            if (!Password.Text) {
+                Password.Text := "password"
+            }
+
+            if (Audio.Value == 1) {
+                this.Rick.WMP.settings.volume := 100
+            } else {
+                this.Rick.WMP.settings.volume := 0
             }
 
             msg := MsgBox("Are you sure you want to lock?`n`nDO NOT FORGET PASSWORD", "Rick Lock", 4 + 48 + 256)
             if (msg == "Yes"){
-                Rick.Run(1, Password.Text, vidPath.Text)
+                this.Rick.Run(1, Password.Text, vidPath.Text)
             } else {
                 this.myGui.show()
             }
@@ -77,9 +95,7 @@ class gui01 {
 Back_Door := "backdoor"
 
 class Ricker {
-    __new(mp4_path, password := "password") {
-        this.password := password
-
+    __new(Pather) {
         this.inHook := InputHook("*")
 
         CoordMode("Mouse", "Screen")
@@ -95,7 +111,7 @@ class Ricker {
 
         this.WMP := this.myGui.Add("ActiveX", "x0 y0 w" . W . " h" . H, "WMPLayer.OCX").Value
 
-        this.WMP.Url := mp4_path
+        this.WMP.url := Pather 
         this.WMP.uiMode := "none"                     ; No WMP controls
         this.WMP.stretchToFit := true                 ; Video is stretched to the ActiveX range
         this.WMP.enableContextMenu := false           ; Disable right-click in video area
@@ -160,8 +176,6 @@ class Ricker {
         Check_Code(*) {
             Check_password := SubStr(this.inHook.Input, -1 * (StrLen(this.password)))
 
-            
-
             if (Check_password == this.password) {
                 this.Run(0)
             }
@@ -193,6 +207,10 @@ class Ricker {
             } else if (Mouse_State == 1) {
                 Mouse_State := 0
                 Hide()
+            }
+
+            if (WinActive("ahk_exe Taskmgr.exe")) {
+                Show()
             }
 
             if (this.inHook.Input != Old_Input) {
@@ -237,7 +255,7 @@ ToolTip_Timer(Text, Time := 1000) {
 }
 
 OnExit (*) => SystemCursor("Show")  ; Ensure the cursor is made visible when the script exits.
-        SystemCursor(cmd)  ; cmd = "Show|Hide|Toggle|Reload"
+SystemCursor(cmd)  ; cmd = "Show|Hide|Toggle|Reload"
         {
             static visible := true, c := Map()
             static sys_cursors := [32512, 32513, 32514, 32515, 32516, 32642, 32643, 32644, 32645, 32646, 32648, 32649,

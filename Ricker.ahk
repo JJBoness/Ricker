@@ -102,7 +102,7 @@ class Ricker {
         this.inHook := InputHook("*")
 
         CoordMode("Mouse", "Screen")
-        MonitorGet(2, &X, &Y, &W, &H)
+        MonitorGet(1, &X, &Y, &W, &H)
         W -= X
         H -= Y
 
